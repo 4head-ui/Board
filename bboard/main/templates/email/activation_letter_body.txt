@@ -1,0 +1,4 @@
+Уважаемый пользователь {{ user.username }} !
+Пройдите по ссылке для активации(скопируйте)
+{{ host }}{% url 'main:register_activate' sign=sign %}
+До свидания!

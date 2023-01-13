@@ -1,0 +1,49 @@
+{% extends "layout/basic.html" %}
+
+{% load thumbnail %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+    <h2>Профиль пользователя {{ user.username }}</h2>
+    {% if user.first_name and user.last_name %}
+    <p>Здравствйуте, {{ user.first_name }} {{ user.last_name }}!</p>
+    {% else %}
+    <p>Здравствуйте!</p>
+    {% endif %}
+    <p><a href="{% url 'main:profile_bb_add' %}">Добавить объявление</a></p>
+    <h3>Ваши объявления:</h3>
+
+    {% if bbs %}
+    <ul class="list-unstyled"> <!-- Перечень Bootstrap -->
+        {% for bb in bbs %}
+        {% url 'main:profile_bb_detail' rubric_pk=bb.rubric.pk pk=bb.pk as url %}
+        <li class="media my-5 p-3 border"> <!-- my-5 - большие внешние отступы сверху и снизу.
+                                            p-3 - внутренние средние отступы со всех сторон. border - рамка -->
+            <a href="{{ url }}{{ all }}"> <!-- all - from middlewares.bboard_context_processor -->
+                {% if bb.image %}
+                <img class="mr-3" src="{% thumbnail bb.image 'default' %}">
+                {% else %}
+                <img class="empty-image mr-3" src="{% static 'main/empty.jpg' %}"> <!-- empty-image - from style.css -->
+                {% endif %}
+            </a>
+            <div class="media-body">
+                <h3><a href="{{ url }}{{ all }}">{{ bb.title }}</a> </h3>
+                <p class="font-italic">{{ bb.rubric.super_rubric.name }} - {{ bb.rubric.name }}</p>
+                <p class="text-right font-weight-bold">{{ bb.price }} руб.</p>
+                <p class="text-right font-italic">{{ bb.created_at }}</p>
+                <p class="text-right mt-2">
+                    <a href="{% url 'main:profile_bb_change' pk=bb.pk %}">Исправить</a>
+                    <a href="{% url 'main:profile_bb_delete' pk=bb.pk %}">Удалить</a>
+                </p>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+{% bootstrap_pagination page  %}
+
+{% endblock %}

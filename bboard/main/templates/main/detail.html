@@ -1,0 +1,80 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% load bootstrap4 %}
+{% block title %}{{ bb.title }} - {{ bb.rubric.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        {% if bb.image %}
+        <div class="col-md-auto">
+            <a href="{{ bb.image.url }}">
+                <img src="{{ bb.image.url }}" class="main-image">
+            </a>
+        </div>
+        <!-- main-image - определен в main/style.css -->
+        {% else %}
+        <div class="col-md-auto"><img class="main-image" src="{% static 'main/empty.jpg' %}"></div>
+        {% endif %}
+        <div class="col">
+            <h2>{{ bb.title }}</h2>
+            <p>{{ bb.content }}</p>
+            <p class="font-weight-bold">{{ bb.price }} руб.</p>
+
+            {% if bb.author.first_name %}
+            <p>{{ bb.contacts }} - {{ bb.author.first_name }}</p>
+            {% else %}
+            <p>{{ bb.contacts }} - {{ bb.author }}</p>
+            {% endif %}
+
+            <p class="text-right font-italic">Объявление добавлено {{ bb.created_at }}</p>
+        </div>
+    </div>
+</div>
+
+{% if ais %}
+<div class="d-flex justify-content-start flex-wrap mt-5">
+<!-- d-flex - устанавлиает для элемента гибкую разметку, при которой
+дочерние элементы выстраиваются внутри родителя по горизонтали.
+justify-content-between - указывает, что дочерние элементы (доп. иллюстрации)
+должны располагаться внутри родителя на равном расстоянии.
+flex-wrap - если не хватит места по гоизонтали - перенести элементы на след. строку.
+mt-5 - большой внешний отступ сверху -->
+    {% for ai in ais %}
+    <div class="mr-2">
+        <a href="{{ ai.image.url }}">
+            <img class="additional-image" src="{{ ai.image.url }}">
+            <!-- additional-image - определен в main/style.css -->
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<p><a href="{% url 'main:by_rubric' pk=bb.rubric.pk %}{{ all }}">Назад</a></p>
+<h4 class="mt-5">Новый коментарий</h4>
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form layout='horizontal' %}
+    {% buttons submit='Добавить' %}{% endbuttons %}
+</form>
+{% if comments %}
+
+<div class="mt-5">
+    {% for comment in comments %}
+    <div class="my-2 p-2 border"> <!--my-2 - небольшие внешние отступы сверху и снизу.
+                                  p-2 - небольшие внутренние отступы со всех сторон -->
+        <h5>{{ comment.author }}</h5>
+        <p>{{ comment.content }}</p>
+        <p class="text-right font-italic">{{ comment.created_at}}</p>
+        <form method="post">
+            {% csrf_token %}
+            {% if user.is_superuser %}
+            <input type="hidden" name="comment_delete" value="{{ comment.pk }}">
+            <input type="submit" value="Удалить (как администратор)">
+            {% endif %}
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

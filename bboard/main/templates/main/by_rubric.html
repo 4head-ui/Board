@@ -1,0 +1,51 @@
+{% extends "layout/basic.html" %}
+
+{% load thumbnail %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% block title %}{{ rubric }}{% endblock %}
+
+{% block searchform %}
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-2">{{ rubric }}</h2>
+
+<div class="container-fluid mb-2">  <!-- container-fluid - таблица HTML. mb-2 - отступ снизу -->
+    <div class="row"> <!-- Строка таблицы -->
+        <div class="col">&nbsp;</div> <!-- Строка таблицы. &nbsp; - неразрыный пробел -->
+        <form class="col-md-auto form-inline"> <!-- col-md-auto - ячейка с шириной, равной содержимому.
+                                                form-inline - вывести элементы управления в 1 строку -->
+            {% bootstrap_form form show_label=False %}
+            {% bootstrap_button content='Искать' button_type='submit' %}
+        </form>
+    </div>
+</div>
+
+{% if bbs %}
+<ul class="list-unstyled"> <!-- Перечень Bootstrap -->
+    {% for bb in bbs %}
+    <li class="media my-5 p-3 border"> <!-- my-5 - большие внешние отступы сверху и снизу.
+                                        p-3 - внутренние средние отступы со всех сторон. border - рамка -->
+        {% url 'main:detail' rubric_pk=rubric.pk pk=bb.pk as url %}
+        <a href="{{ url }}{{ all }}"> <!-- all - from middlewares.bboard_context_processor -->
+            {% if bb.image %}
+            <img class="mr-3" src="{% thumbnail bb.image 'default' %}">
+            {% else %}
+            <img class="empty-image mr-3" src="{% static 'main/empty.jpg' %}"> <!-- empty-image - from style.css -->
+            {% endif %}
+        </a>
+        <div class="media-body">
+            <h3><a href="{{ url }}{{ all }}">{{ bb.title }}</a> </h3>
+            <p class="text-right font-weight-bold">{{ bb.price }} руб.</p>
+            <p class="text-right font-italic">{{ bb.created_at }}</p>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+{% bootstrap_pagination page url=keyword %} <!-- url=keyword - при переходе на другую часть пагинатора контроллер
+                                            получит это слово и сможет выполнить фильтрацию -->
+{% endif %}
+{% endblock %}
