@@ -1,1 +1,1 @@
-<h1>Учебный проект "Доска объявлений" по книге Дронова</h1>
+<h1>Bulletin board based on Dronov's book</h1>
